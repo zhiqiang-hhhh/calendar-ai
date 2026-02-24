@@ -1,3 +1,5 @@
+'use client'
+
 import { FC, RefObject, useEffect, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -21,8 +23,13 @@ interface CustomHeaderProps {
 const CustomHeader: FC<CustomHeaderProps> = ({ calendarRef }) => {
   const [showToday, setShowToday] = useState(false)
   const [active, setActive] = useState<Tab>('Week')
+  const [mounted, setMounted] = useState(false)
   const { isMobile } = useDevice()
   const { setTheme, theme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const updateShowToday = () => {
@@ -115,7 +122,7 @@ const CustomHeader: FC<CustomHeaderProps> = ({ calendarRef }) => {
           size="sm"
           onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
         >
-          {theme === 'light' ? <Moon /> : <Sun />}
+          {mounted && theme === 'light' ? <Moon /> : <Sun />}
         </Button>
       </div>
 

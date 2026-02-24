@@ -22,6 +22,7 @@ export function Chat({
   closeChat: () => void
   chatOpen: string
 }) {
+  const refetchRangeRef = useRef<{ start: string; end: string } | null>(null)
   const [input, setInput] = useState(chatOpen)
   const [messages, setMessages] = useState<ClientMessage[]>([])
   const [threadId, setThreadId] = useState('')
@@ -84,10 +85,21 @@ export function Chat({
         }
       })()
       ;(async () => {
+        for await (const range of readStreamableValue<{
+          start: string
+          end: string
+        } | null>(response.refetchRangeStream)) {
+          refetchRangeRef.current = range || null
+        }
+      })()
+      ;(async () => {
         for await (const _ of readStreamableValue<string>(
           response.refetchJobsStream,
         )) {
-          refetchEvents()
+          const range = refetchRangeRef.current
+          if (range) {
+            refetchEvents(range.start, range.end)
+          }
         }
       })()
 

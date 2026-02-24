@@ -68,8 +68,9 @@ export function CommandK() {
       }
 
       const data = await response.json()
+      const contactEmails = Array.isArray(data?.contacts) ? data.contacts : []
       setContacts(
-        data.contacts.map((email: string) => ({ id: email, display: email })),
+        contactEmails.map((email: string) => ({ id: email, display: email })),
       )
     }
 

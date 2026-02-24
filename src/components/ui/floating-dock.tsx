@@ -84,9 +84,27 @@ export const FloatingDock = () => {
         >
           <AnimatePresence mode="wait">
             {!chatOpen ? (
-              items.map((item) => <IconContainer key={item.title} {...item} />)
+              <motion.div
+                key="dock-icons"
+                className="flex gap-4 items-center justify-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {items.map((item) => (
+                  <IconContainer key={item.title} {...item} />
+                ))}
+              </motion.div>
             ) : (
-              <Chat chatOpen={chatOpen} closeChat={() => setChatOpen('')} />
+              <motion.div
+                key="dock-chat"
+                className="w-full h-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Chat chatOpen={chatOpen} closeChat={() => setChatOpen('')} />
+              </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
@@ -113,7 +131,6 @@ function IconContainer({
   const [hovered, setHovered] = useState(false)
 
   const commonProps = {
-    key: 'icons',
     initial: { opacity: 0 },
     animate: { opacity: 1 },
     exit: { opacity: 0 },

@@ -47,11 +47,13 @@ To run this application, you need to configure several environment variables. Yo
 
 ### Required Environment Variables:
 
-- `OPENAI_API_KEY`: Your OpenAI API key, used for integrating GPT features.
+- `OPENAI_API_KEY`: API key for your OpenAI-compatible provider.
+- `OPENAI_BASE_URL` (optional): Base URL of an OpenAI-compatible API endpoint. Leave empty for OpenAI default.
 - `GOOGLE_CLIENT_ID`: The Client ID for Google OAuth, used for authenticating users.
 - `GOOGLE_CLIENT_SECRET`: The Client Secret for Google OAuth.
 - `NEXTAUTH_SECRET`: A secret key used by NextAuth.js to encrypt session data.
-- `ASSISTANT_ID`: The unique ID of your OpenAI assistant.
+- `ASSISTANT_MODEL` (optional): Main model used for calendar assistant responses and tool-calling.
+- `TIME_RANGE_MODEL` (optional): Model used to extract time ranges from user messages. Defaults to `ASSISTANT_MODEL`.
 - `NEXTAUTH_URL`: The URL of your Next.js application, used by NextAuth.js.
 
 ### Steps to Generate and Use Environment Variables:
@@ -73,50 +75,27 @@ To run this application, you need to configure several environment variables. Yo
    pnpm run dev
    ```
 
-## 🤖 Setting Up the OpenAI Assistant
+## 🤖 Cross-Provider Assistant Setup
 
-This project includes an OpenAI Assistant that helps automate and manage your calendar through natural language. Follow the steps below to create and integrate the assistant:
+This project now uses a provider-agnostic architecture based on `chat.completions + tool calling` (no Assistants API dependency). Tool definitions and instructions are loaded from:
 
-1. **Create an Assistant on the OpenAI Platform:**
+- `assistant/functions/*.json`
+- `assistant/instruction.txt`
 
-   - Visit the [OpenAI Assistants](https://platform.openai.com/assistants) page.
-   - Click on "Create Assistant."
-   - Fill in the details such as the name, description, and abilities of your assistant.
-   - Ensure you enable the ability to run code within the assistant's settings.
-   - Save the Assistant and copy the `ASSISTANT_ID`.
+Use any OpenAI-compatible provider by setting:
 
-2. **Add the Assistant ID to Environment Variables:**
+```bash
+OPENAI_API_KEY=your-provider-key
+OPENAI_BASE_URL=https://your-provider-openai-compatible-endpoint/v1
+ASSISTANT_MODEL=your-model-name
+TIME_RANGE_MODEL=your-time-range-model-name
+```
 
-   - Open your `.env.local` file.
-   - Add the `ASSISTANT_ID` you just copied.
+Then run:
 
-   ```bash
-   ASSISTANT_ID=your-assistant-id
-   ```
-
-3. **Configure the Assistant with Functions and Instructions:**
-
-   The JSON files and the instruction file you need to use for configuring the assistant are located in the `assistant/functions/` directory and in the `assistant/instruction.txt` file. Follow these steps to set them up:
-
-   - **Load Functions:**
-
-     - In the assistant configuration panel on OpenAI, find the section where you can add custom functions.
-     - Upload the `edit_event.json`, `get_calendar.json`, and `schedule_event.json` files located in the `functions/` directory. These functions will be used by the assistant to edit events, retrieve the calendar, and schedule new events, respectively.
-
-   - **Add Instructions:**
-
-     - In the same panel, there will be an area to add instructions to the assistant.
-     - Copy the content of the `instruction.txt` file and paste it into the instruction area. These instructions will guide the assistant's behavior and how it should use the available functions.
-
-4. **Test the Integration:**
-
-   Run the development server and interact with the assistant to ensure everything is set up correctly.
-
-   ```bash
-   pnpm run dev
-   ```
-
-   You should now be able to schedule events and manage your calendar using natural language.
+```bash
+pnpm run dev
+```
 
 ## 📄 License
 

@@ -35,12 +35,15 @@ export async function GET() {
         ?.map((attendee) => attendee.email)
     })
 
-    const allAttendees = allEventsAttendees?.flat().filter((email) => email)
+    const allAttendees = allEventsAttendees?.flat()?.filter((email) => email) || []
 
     const allUniqueAttendees = Array.from(new Set(allAttendees))
 
     return NextResponse.json({ contacts: allUniqueAttendees })
   } catch (error: any) {
-    return NextResponse.json({ error: 'Failed to fetch events' })
+    return NextResponse.json(
+      { error: error?.message || 'Failed to fetch events' },
+      { status: 500 },
+    )
   }
 }
