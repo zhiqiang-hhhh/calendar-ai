@@ -46,7 +46,23 @@ export const useEvents = create<State & Actions>((set, get) => ({
         )
 
         if (!response.ok) {
-          throw new Error('Failed to fetch events')
+          let errorBody = ''
+          try {
+            errorBody = await response.text()
+          } catch {
+            errorBody = '<failed to read response body>'
+          }
+
+          console.error('[calendar-ai] Failed to fetch events', {
+            url: response.url,
+            status: response.status,
+            statusText: response.statusText,
+            body: errorBody,
+            requestedRange: range,
+          })
+
+          toast(`Failed to fetch events (${response.status})`)
+          return
         }
 
         const data = await response.json()
@@ -81,6 +97,7 @@ export const useEvents = create<State & Actions>((set, get) => ({
         })
       }
     } catch (error) {
+      console.error('[calendar-ai] Failed to fetch events', { error })
       toast('Failed to fetch events')
     }
   },

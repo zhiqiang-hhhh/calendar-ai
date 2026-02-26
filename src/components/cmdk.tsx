@@ -64,7 +64,20 @@ export function CommandK() {
       const response = await fetch('/api/contacts')
 
       if (!response.ok) {
-        return toast('Failed to fetch contacts.')
+        let errorBody = ''
+        try {
+          errorBody = await response.text()
+        } catch {
+          errorBody = '<failed to read response body>'
+        }
+
+        console.error('[calendar-ai] Failed to fetch contacts', {
+          url: response.url,
+          status: response.status,
+          statusText: response.statusText,
+          body: errorBody,
+        })
+        return toast(`Failed to fetch contacts (${response.status})`)
       }
 
       const data = await response.json()

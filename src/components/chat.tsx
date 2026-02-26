@@ -46,7 +46,20 @@ export function Chat({
       const response = await fetch('/api/contacts')
 
       if (!response.ok) {
-        return toast('Failed to fetch contacts.')
+        let errorBody = ''
+        try {
+          errorBody = await response.text()
+        } catch {
+          errorBody = '<failed to read response body>'
+        }
+
+        console.error('[calendar-ai] Failed to fetch contacts', {
+          url: response.url,
+          status: response.status,
+          statusText: response.statusText,
+          body: errorBody,
+        })
+        return toast(`Failed to fetch contacts (${response.status})`)
       }
 
       const data = await response.json()
@@ -93,12 +106,14 @@ export function Chat({
         }
       })()
       ;(async () => {
-        for await (const _ of readStreamableValue<string>(
+        for await (const _ of readStreamableValue<number>(
           response.refetchJobsStream,
         )) {
           const range = refetchRangeRef.current
           if (range) {
-            refetchEvents(range.start, range.end)
+            await refetchEvents(range.start, range.end)
+          } else {
+            await refetchEvents()
           }
         }
       })()
